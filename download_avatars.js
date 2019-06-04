@@ -19,8 +19,10 @@ const getRepoContributors = (repoOwner, repoName) => {
     return new Promise ((resolve, reject) => {
     if(repoOwner === undefined || repoName === undefined) {
         reject('Please run as follows:\nnpm run <repo owner> <repo name>')
+    } else if (process.argv.length !== 4) {
+        reject('Wrong number of arguments\nPlease run as follows:\nnpm run <repo owner> <repo name>')
     }
-    let response = ''
+    let outcome = ''
     let options = {
         uri: `${BASE_URL}/repos/${repoOwner}/${repoName}/contributors`,
         method: 'GET',
@@ -35,10 +37,15 @@ const getRepoContributors = (repoOwner, repoName) => {
         .get(options)
         .on('error', (err) => reject(err))
         .on('data', (data) => {
-            response += data
+            outcome += data
+        })
+        .on('response', (res) => {
+            if (res.statusCode !== 200 && res.statusCode === 404) {
+                reject('Github User or Repo not found')
+            }
         })
         .on('end', () => {
-            resolve(response)
+            resolve(outcome)
         })
     })
 }
