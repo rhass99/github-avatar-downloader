@@ -46,6 +46,11 @@ const getRepoContributors = (repoOwner, repoName) => {
 // downloadImageByURL creates a file for each image
 // by url and names the file as per his username
 const downloadImageByURL = (url, filePath) => {
+    var dir = './avatars';
+
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
     let img = fs.createWriteStream(filePath)
     img.on('open', () => {
         request(url).pipe(img)
